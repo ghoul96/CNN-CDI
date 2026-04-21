@@ -15,12 +15,15 @@ import slowfast.utils.misc as misc
 import torch
 from fvcore.common.timer import Timer
 from sklearn.metrics import average_precision_score
-from slowfast.utils.ava_eval_helper import (
-    evaluate_ava,
-    read_csv,
-    read_exclusions,
-    read_labelmap,
-)
+try:
+    from slowfast.utils.ava_eval_helper import (
+        evaluate_ava,
+        read_csv,
+        read_exclusions,
+        read_labelmap,
+    )
+except ImportError:
+    evaluate_ava = read_csv = read_exclusions = read_labelmap = None
 
 logger = logging.get_logger(__name__)
 

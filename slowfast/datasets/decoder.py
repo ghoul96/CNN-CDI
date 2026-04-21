@@ -418,8 +418,12 @@ def pyav_decode(
     else:
         # Perform selective decoding.
         decode_all_video = False
+        # sampling_rate and num_frames may be lists when called from decode();
+        # use the first element for the single-stream pyav path.
+        _sr = sampling_rate[0] if isinstance(sampling_rate, (list, tuple)) else sampling_rate
+        _nf = num_frames[0] if isinstance(num_frames, (list, tuple)) else num_frames
         clip_size = np.maximum(
-            1.0, np.ceil(sampling_rate * (num_frames - 1) / target_fps * fps)
+            1.0, np.ceil(_sr * (_nf - 1) / target_fps * fps)
         )
         start_idx, end_idx, fraction = get_start_end_idx(
             frames_length,
@@ -507,6 +511,7 @@ def decode(
             assert min_delta == -math.inf and max_delta == math.inf, (
                 "delta sampling not supported in pyav"
             )
+            start_end_delta_time = None
             frames_decoded, fps, decode_all_video = pyav_decode(
                 container,
                 sampling_rate,
@@ -543,11 +548,14 @@ def decode(
         return None, None, None
 
     # Return None if the frames was not decoded successfully.
-    if frames_decoded is None or None in frames_decoded:
+    if frames_decoded is None:
         return None, None, None
 
     if not isinstance(frames_decoded, list):
         frames_decoded = [frames_decoded]
+
+    if any(f is None for f in frames_decoded):
+        return None, None, None
     num_decoded = len(frames_decoded)
     clip_sizes = [
         np.maximum(1.0, sampling_rate[i] * num_frames[i] / target_fps * fps)
@@ -590,6 +598,10 @@ def decode(
             start_idx, end_idx, clip_position = get_start_end_idx(
                 frames.shape[0], clip_sizes[k], 0, 1
             )
+            if start_end_delta_time is None:
+                start_end_delta_time = np.zeros((num_decode, 3))
+            start_end_delta_time[k, 0] = start_idx
+            start_end_delta_time[k, 1] = end_idx
         if augment_vid:
             frames, time_diff_aug[k] = transform.augment_raw_frames(
                 frames, time_diff_prob, gaussian_prob

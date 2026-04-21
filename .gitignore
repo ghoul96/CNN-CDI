@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+.eggs/
+
+# Build artifacts
+build/
+dist/
+
+# Logs and outputs
+stdout.log
+*.log
+/tmp/
+
+# Virtual environment (never push)
+sf_env/
+venv/
+env/
+
+# Checkpoints and model weights (too large)
+checkpoints/
+*.pyth
+*.pth
+*.pkl
+
+# Dataset outputs
+C:/temp/
