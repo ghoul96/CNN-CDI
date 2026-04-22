@@ -1,0 +1,77 @@
+# configs/my_experiment/quickstart_c2d.yaml
+# ──────────────────────────────────────────────────────────────────────────
+# Quick-start single-GPU config for experimenting on a small custom dataset.
+# Copy this file and adjust paths + NUM_CLASSES for your use case.
+#
+# Run with:
+#   python tools/run_net.py --cfg configs/my_experiment/quickstart_c2d.yaml
+# ──────────────────────────────────────────────────────────────────────────
+
+TRAIN:
+  ENABLE: True
+  DATASET: kinetics               # Uses the Kinetics data loader (CSV format)
+  BATCH_SIZE: 4                   # Small batch for a single consumer GPU
+  EVAL_PERIOD: 5                  # Evaluate every 5 epochs
+  CHECKPOINT_PERIOD: 5            # Save every 5 epochs
+  AUTO_RESUME: True               # Resume from last checkpoint if available
+
+TEST:
+  ENABLE: True
+  DATASET: kinetics
+  BATCH_SIZE: 4
+  NUM_ENSEMBLE_VIEWS: 1           # Fast evaluation (set to 10 for best accuracy)
+  NUM_SPATIAL_CROPS: 1
+
+DATA:
+  PATH_TO_DATA_DIR: /tmp/synthetic_kinetics   # ← Change to your dataset path
+  NUM_FRAMES: 8
+  SAMPLING_RATE: 8
+  TRAIN_JITTER_SCALES: [256, 320]
+  TRAIN_CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  INPUT_CHANNEL_NUM: [3]          # Single pathway for C2D
+
+MODEL:
+  NUM_CLASSES: 5                  # ← Change to your number of classes
+  ARCH: c2d
+  MODEL_NAME: ResNet
+  LOSS_FUNC: cross_entropy
+  DROPOUT_RATE: 0.5
+
+RESNET:
+  DEPTH: 50                       # ResNet-50 backbone
+  TRANS_FUNC: bottleneck_transform
+  STRIDE_1X1: False
+  NUM_GROUPS: 1
+  WIDTH_PER_GROUP: 64
+  ZERO_INIT_FINAL_BN: True
+  NUM_BLOCK_TEMP_KERNEL: [[3], [4], [6], [3]]
+
+NONLOCAL:
+  LOCATION: [[[]], [[]], [[]], [[]]]
+  GROUP: [[[1]], [[1]], [[1]], [[1]]]
+  INSTANTIATION: softmax
+
+BN:
+  USE_PRECISE_STATS: False
+
+SOLVER:
+  BASE_LR: 0.00125                # 0.1 × (4 / 320)  (linear LR scaling)
+  LR_POLICY: cosine
+  MAX_EPOCH: 20
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 0.0001
+  WARMUP_EPOCHS: 3.0
+  WARMUP_START_LR: 0.000125
+  OPTIMIZING_METHOD: sgd
+
+DATA_LOADER:
+  NUM_WORKERS: 4                  # Increase if data loading is slow
+  PIN_MEMORY: True
+
+NUM_GPUS: 1
+
+TENSORBOARD:
+  ENABLE: True                    # View metrics at http://localhost:6006
+
+OUTPUT_DIR: ./output/quickstart_c2d

@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PySlowFast – Guide Étudiant Débutant (Windows & Mac)</title>
+<style>
+  /* ── IMPRESSION / PDF ─────────────────────────────────────── */
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  @media print {
+    .no-print { display: none; }
+    .page-break { page-break-before: always; }
+    body { font-size: 10.5pt; }
+    pre, code { font-size: 8.5pt; }
+    pre { overflow: visible !important; white-space: pre-wrap !important; word-break: break-word !important; }
+    .win-only, .mac-only { display: block !important; }
+  }
+
+  /* ── BASE ─────────────────────────────────────────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6fa; color: #1a1a2e; line-height: 1.7; }
+  .page { max-width: 840px; margin: 0 auto; background: #fff; padding: 38px 48px; }
+
+  /* ── COUVERTURE ───────────────────────────────────────────── */
+  .cover {
+    min-height: 97vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+    color: #fff; padding: 50px 40px; page-break-after: always;
+  }
+  .cover .badge { background: #e94560; color: #fff; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; padding: 5px 16px; border-radius: 20px;
+    margin-bottom: 26px; display: inline-block; }
+  .cover h1 { font-size: 42px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+  .cover h1 span { color: #e94560; }
+  .cover p.subtitle { font-size: 17px; opacity: .85; max-width: 560px; margin: 0 auto 36px; }
+  .cover-meta { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  .cover-meta div { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 12px; padding: 14px 24px; text-align: center; }
+  .cover-meta div .label { font-size: 10px; opacity: .6; text-transform: uppercase; letter-spacing: 1px; }
+  .cover-meta div .value { font-size: 18px; font-weight: 700; margin-top: 3px; }
+  .cover-footer { margin-top: 56px; font-size: 12px; opacity: .5; }
+  .platform-box { background: rgba(255,255,255,.1); border-radius: 10px; padding: 12px 20px;
+    font-size: 13px; min-width: 150px; }
+  .platform-box span { opacity: .7; display: block; margin-top: 3px; font-size: 12px; }
+
+  /* ── TITRES ───────────────────────────────────────────────── */
+  h1 { font-size: 26px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 7px; margin: 30px 0 18px; }
+  h2 { font-size: 18px; color: #16213e; margin: 24px 0 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin: 18px 0 7px; }
+  p  { margin-bottom: 11px; }
+  ul, ol { margin: 7px 0 12px 22px; }
+  li { margin-bottom: 5px; }
+
+  /* ── BADGES PLATEFORME ────────────────────────────────────── */
+  .os-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 12px; margin-right: 4px; vertical-align: middle;
+    letter-spacing: .5px; text-transform: uppercase;
+  }
+  .os-win  { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .os-mac  { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+  .os-all  { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+
+  /* ── SÉLECTEUR DE PLATEFORME (écran uniquement) ───────────── */
+  .platform-selector {
+    background: #f0f4ff; border-radius: 12px; padding: 16px 22px;
+    margin-bottom: 22px; border: 2px solid #0f3460;
+  }
+  .platform-selector strong { font-size: 14px; }
+  .platform-tabs { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .ptab {
+    padding: 9px 22px; border-radius: 8px; border: 2px solid #ddd;
+    cursor: pointer; font-weight: 700; font-size: 14px; background: #fff; color: #666;
+    transition: all .15s;
+  }
+  .ptab:hover { opacity: .85; }
+  .ptab.active-win { border-color: #1e40af; background: #dbeafe; color: #1e40af; }
+  .ptab.active-mac { border-color: #9d174d; background: #fce7f3; color: #9d174d; }
+
+  /* affichage/masquage — Windows affiché par défaut */
+  .win-only { display: block; }
+  .mac-only { display: none; }
+  body.show-mac .win-only { display: none; }
+  body.show-mac .mac-only { display: block; }
+
+  /* ── DOUBLE COLONNE ───────────────────────────────────────── */
+  .dual-step { display: flex; gap: 16px; margin: 14px 0; flex-wrap: wrap; }
+  .dual-step .half { flex: 1; min-width: 260px; }
+
+  /* ── EN-TÊTE DE SECTION ───────────────────────────────────── */
+  .section-header {
+    background: linear-gradient(90deg, #0f3460, #16213e); color: #fff;
+    padding: 18px 26px; border-radius: 12px; margin: 34px 0 22px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .section-header .num {
+    background: #e94560; width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 17px; flex-shrink: 0;
+  }
+  .section-header h1 { color: #fff; border: none; padding: 0; margin: 0; font-size: 21px; }
+  .section-header p  { color: rgba(255,255,255,.7); font-size: 12px; margin: 2px 0 0; }
+
+  /* ── BOÎTES D'ÉTAPES ──────────────────────────────────────── */
+  .step {
+    border-left: 5px solid #0f3460; background: #f0f4ff;
+    border-radius: 0 10px 10px 0; padding: 16px 20px; margin: 16px 0;
+  }
+  .step-number {
+    display: inline-block; background: #0f3460; color: #fff;
+    font-weight: 800; font-size: 12px; padding: 2px 11px;
+    border-radius: 20px; margin-bottom: 7px;
+  }
+
+  /* ── CODE ─────────────────────────────────────────────────── */
+  pre {
+    background: #1a1a2e; color: #e2e8f0; border-radius: 10px;
+    padding: 14px 18px; overflow-x: auto; margin: 10px 0;
+    font-family: 'Consolas','Courier New', monospace;
+    font-size: 12.5px; line-height: 1.6; border-left: 4px solid #e94560;
+  }
+  .pre-win { border-left-color: #60a5fa; }
+  .pre-mac { border-left-color: #f472b6; }
+  .pre-all { border-left-color: #34d399; }
+  code {
+    background: #eef1fb; color: #c0392b; padding: 2px 6px;
+    border-radius: 4px; font-family: 'Consolas','Courier New', monospace; font-size: .87em;
+  }
+  pre code { background: none; color: inherit; padding: 0; border-radius: 0; font-size: inherit; }
+
+  /* ── ENCADRÉS ─────────────────────────────────────────────── */
+  .callout {
+    border-radius: 10px; padding: 13px 18px; margin: 14px 0;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .callout .icon { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+  .callout.info    { background: #e8f4fd; border-left: 5px solid #2980b9; }
+  .callout.warning { background: #fef9e7; border-left: 5px solid #f39c12; }
+  .callout.success { background: #eafaf1; border-left: 5px solid #27ae60; }
+  .callout.danger  { background: #fdecec; border-left: 5px solid #e74c3c; }
+  .callout strong  { display: block; margin-bottom: 3px; }
+
+  /* ── RÉSULTAT ATTENDU ─────────────────────────────────────── */
+  .result-box {
+    background: #0d1117; color: #58d68d;
+    font-family: 'Consolas', monospace; font-size: 11.5px;
+    border-radius: 10px; padding: 12px 16px; margin: 10px 0;
+    border: 1px solid #2d5a3d; white-space: pre-wrap;
+  }
+
+  /* ── TABLEAUX ─────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+  th { background: #0f3460; color: #fff; padding: 9px 13px; text-align: left; }
+  td { padding: 8px 13px; border-bottom: 1px solid #e8ecf5; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8f9ff; }
+
+  /* ── LISTE DE CONTRÔLE ────────────────────────────────────── */
+  .check-item { display: flex; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px dashed #dde3f7; }
+  .check-box  { width: 20px; height: 20px; border: 2px solid #0f3460; border-radius: 4px; flex-shrink: 0; }
+
+  /* ── TABLE DES MATIÈRES ───────────────────────────────────── */
+  .toc { background: #f8f9ff; border: 1px solid #dde3f7; border-radius: 12px; padding: 24px 32px; margin: 18px 0 28px; }
+  .toc h2      { color: #0f3460; margin: 0 0 14px; font-size: 17px; }
+  .toc-section { font-weight: 700; color: #0f3460; margin-top: 9px; font-size: 13px; }
+  .toc ol      { margin-left: 16px; }
+  .toc li      { margin-bottom: 3px; font-size: 13.5px; }
+  .toc a       { color: #16213e; text-decoration: none; }
+
+  /* ── RÉSULTAT ATTENDU (vert) ──────────────────────────────── */
+  .expected { background: #eafaf1; border: 1px solid #a9dfbf; border-radius: 10px; padding: 12px 18px; margin: 10px 0; }
+  .expected strong { color: #1e8449; display: block; margin-bottom: 5px; }
+
+  /* ── SOUS-TITRE DE SECTION ────────────────────────────────── */
+  .mini-header {
+    background: #f0f4ff; border-radius: 8px; padding: 9px 16px;
+    margin: 20px 0 12px; font-weight: 700; color: #16213e;
+    font-size: 14px; border-left: 4px solid #0f3460;
+  }
+
+  /* ── DIVERS ───────────────────────────────────────────────── */
+  hr { border: none; border-top: 2px solid #eef1fb; margin: 26px 0; }
+</style>
+</head>
+<body class="show-win">
+
+<!-- ══════════════════════════════════ PAGE DE COUVERTURE -->
+<div class="cover">
+  <div class="badge">Guide Pratique Étudiant — Multi-Plateformes</div>
+  <h1>Débuter avec<br><span>PySlowFast</span></h1>
+  <p class="subtitle">Guide pas à pas pour les grands débutants — fonctionne sur Windows (GPU NVIDIA), Mac Apple Silicon (M1/M2/M3) et Mac Intel</p>
+  <div class="cover-meta">
+    <div><div class="label">Niveau</div><div class="value">🟢 Débutant</div></div>
+    <div><div class="label">Plateformes</div><div class="value">🪟 🍎</div></div>
+    <div><div class="label">Durée estimée</div><div class="value">~2 Heures</div></div>
+    <div><div class="label">Sections</div><div class="value">10 Étapes</div></div>
+  </div>
+  <div style="margin-top:28px; display:flex; gap:18px; justify-content:center; flex-wrap:wrap;">
+    <div class="platform-box">🪟 <strong>Windows</strong><span>NVIDIA RTX 3060<br>Accélération CUDA</span></div>
+    <div class="platform-box">🍎 <strong>Mac Apple Silicon</strong><span>M1 / M2 / M3<br>Mode CPU (stable)</span></div>
+    <div class="platform-box">🍎 <strong>Mac Intel</strong><span>Ancien MacBook / iMac<br>Mode CPU uniquement</span></div>
+  </div>
+  <div class="cover-footer">
+    PySlowFast — Facebook AI Research (FAIR) &nbsp;|&nbsp; Licence Apache 2.0 &nbsp;|&nbsp; github.com/facebookresearch/slowfast
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ CONTENU PRINCIPAL -->
+<div class="page">
+
+<!-- SÉLECTEUR DE PLATEFORME (écran uniquement) -->
+<div class="platform-selector no-print">
+  <strong>👇 Sélectionnez votre type d'ordinateur pour afficher les bonnes commandes :</strong>
+  <div class="platform-tabs">
+    <button class="ptab active-win" onclick="setOS('win')">🪟 Windows (GPU NVIDIA)</button>
+    <button class="ptab" onclick="setOS('mac')">🍎 Mac (Apple Silicon ou Intel)</button>
+  </div>
+  <p style="font-size:12px; color:#888; margin-top:8px;">
+    Lors de l'impression ou de l'enregistrement en PDF, les commandes Windows <strong>et</strong> Mac sont toutes affichées côte à côte.
+  </p>
+</div>
+
+<!-- TABLE DES MATIÈRES -->
+<div class="toc">
+  <h2>📋 Table des matières</h2>
+  <div class="toc-section">Partie A — Comprendre le projet</div>
+  <ol>
+    <li><a href="#what">Qu'est-ce que PySlowFast ?</a></li>
+    <li><a href="#platforms">Quel type d'ordinateur ai-je ?</a></li>
+  </ol>
+  <div class="toc-section">Partie B — Préparer votre ordinateur</div>
+  <ol start="3">
+    <li><a href="#check">Vérifier votre configuration</a></li>
+    <li><a href="#venv">Créer un environnement Python isolé</a></li>
+    <li><a href="#pytorch">Installer PyTorch (le moteur IA)</a></li>
+    <li><a href="#deps">Installer toutes les autres bibliothèques</a></li>
+    <li><a href="#clone">Télécharger PySlowFast</a></li>
+  </ol>
+  <div class="toc-section">Partie C — Faire fonctionner l'IA</div>
+  <ol start="8">
+    <li><a href="#dataset">Créer un faux jeu de données de test</a></li>
+    <li><a href="#train">Entraîner votre premier modèle</a></li>
+    <li><a href="#demo">Lancer la démo sur une vraie vidéo</a></li>
+  </ol>
+  <div class="toc-section">Partie D — Aide et référence</div>
+  <ol start="11">
+    <li><a href="#results">Comprendre les résultats</a></li>
+    <li><a href="#errors">Erreurs fréquentes et solutions</a></li>
+    <li><a href="#glossary">Glossaire</a></li>
+    <li><a href="#checklist">Liste de contrôle finale</a></li>
+  </ol>
+</div>
+
+<div class="callout info">
+  <div class="icon">ℹ️</div>
+  <div>
+    <strong>Comment utiliser ce guide</strong>
+    Chaque étape numérotée contient une commande à taper. Tapez-la <em>exactement</em> telle qu'elle est écrite — même un seul caractère incorrect peut causer une erreur.
+    Sur écran, utilisez le sélecteur ci-dessus pour afficher uniquement les commandes de votre plateforme.
+    Lors de l'impression en PDF, les commandes Windows et Mac apparaissent automatiquement côte à côte.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QU'EST-CE QUE PYSLOWFAST ? -->
+<div class="page-break"></div>
+<div class="section-header" id="what">
+  <div class="num">A</div>
+  <div>
+    <h1>Qu'est-ce que PySlowFast ?</h1>
+    <p>Comprendre ce que vous allez installer — en langage simple</p>
+  </div>
+</div>
+
+<p>Imaginez que vous regardez une vidéo de quelqu'un qui joue au basket. Pour comprendre ce qui se passe, vous devez faire <strong>deux choses en même temps</strong> :</p>
+<ol>
+  <li><strong>Percevoir la scène globale</strong> — À quoi ressemble le terrain ? Où sont les joueurs ?</li>
+  <li><strong>Capter les mouvements rapides</strong> — Le ballon se déplace-t-il ? Quelqu'un saute-t-il en ce moment ?</li>
+</ol>
+<p>PySlowFast est un programme d'IA qui fait les deux simultanément, grâce à deux « voies » distinctes :</p>
+
+<table>
+  <tr><th>Nom</th><th>Ce qu'elle fait</th><th>Équivalent humain</th></tr>
+  <tr><td>🐢 <strong>Voie Lente (Slow)</strong></td><td>Analyse peu d'images par seconde — perçoit clairement la scène globale</td><td>Regarder une photo</td></tr>
+  <tr><td>🐇 <strong>Voie Rapide (Fast)</strong></td><td>Analyse beaucoup d'images par seconde — capte les mouvements brusques</td><td>Regarder en temps réel</td></tr>
+</table>
+
+<p>Résultat : une IA capable de regarder n'importe quelle vidéo et de dire <em>« Cette personne joue de la guitare »</em> ou <em>« Cette vidéo montre quelqu'un qui cuisine »</em>.</p>
+
+<div class="callout success">
+  <div class="icon">🎯</div>
+  <div>
+    <strong>Ce que vous allez accomplir aujourd'hui</strong>
+    Votre ordinateur va regarder une vidéo et identifier l'action qui s'y déroule, grâce à une IA entraînée sur 400 types d'actions humaines.
+    Cette même technologie est utilisée dans les caméras de surveillance, l'analyse sportive et la surveillance médicale.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUEL ORDINATEUR AI-JE ? -->
+<div class="section-header" id="platforms">
+  <div class="num">B</div>
+  <div>
+    <h1>Quel type d'ordinateur ai-je ?</h1>
+    <p>Identifiez votre configuration avant de commencer</p>
+  </div>
+</div>
+
+<table>
+  <tr><th>Type d'ordinateur</th><th>Comment reconnaître le vôtre</th><th>Vitesse IA</th><th>Ce qu'on installe</th></tr>
+  <tr>
+    <td>🪟 <strong>Windows + GPU NVIDIA</strong></td>
+    <td>PC portable ou fixe Windows avec une carte NVIDIA RTX, GTX ou similaire</td>
+    <td>⚡⚡⚡ Rapide</td>
+    <td>PyTorch + CUDA 12.1 (accélération GPU complète)</td>
+  </tr>
+  <tr>
+    <td>🍎 <strong>Mac — Apple Silicon</strong></td>
+    <td>Mac acheté fin 2020 ou après, avec une puce M1, M2 ou M3.<br>Vérifier : Menu Apple → À propos de ce Mac → chercher « M1 » / « M2 » / « M3 »</td>
+    <td>⚡⚡ Modéré (CPU)</td>
+    <td>PyTorch standard — MPS disponible mais on utilise le CPU pour la stabilité</td>
+  </tr>
+  <tr>
+    <td>🍎 <strong>Mac — Intel</strong></td>
+    <td>Ancien Mac avec processeur Intel Core i5/i7/i9.<br>Vérifier : À propos de ce Mac → chercher « Intel Core »</td>
+    <td>⚡ Lent (CPU uniquement)</td>
+    <td>PyTorch CPU — aucune accélération GPU</td>
+  </tr>
+</table>
+
+<div class="callout info">
+  <div class="icon">💡</div>
+  <div>
+    <strong>Qu'est-ce qu'un GPU ?</strong>
+    Un GPU (processeur graphique) est une puce spéciale capable d'effectuer des milliers de calculs mathématiques simultanément.
+    L'entraînement d'une IA nécessite des millions de calculs — un GPU les effectue 100 fois plus vite qu'un processeur classique.
+    Les GPU NVIDIA utilisent le système CUDA sur Windows. Les Mac Apple Silicon disposent d'un moteur neuronal intégré, mais PySlowFast ne le supporte pas encore complètement — on utilise donc le mode CPU sur tous les Mac.
+  </div>
+</div>
+
+<div class="callout warning">
+  <div class="icon">⚠️</div>
+  <div>
+    <strong>Utilisateurs Mac — à savoir sur la vitesse</strong>
+    PySlowFast a été conçu pour Linux/Windows avec des GPU NVIDIA. Sur Mac, il fonctionne en mode CPU uniquement, ce qui est 10 à 30 fois plus lent.
+    Pour cette démo de cours avec de petites vidéos fictives, l'entraînement dure 5 à 30 minutes — acceptable pour apprendre.
+    L'entraînement complet sur Kinetics-400 prendrait plusieurs jours sur Mac et n'est pas recommandé.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 1 — VÉRIFIER LA CONFIGURATION -->
+<div class="page-break"></div>
+<div class="section-header" id="check">
+  <div class="num">1</div>
+  <div>
+    <h1>Vérifier votre configuration</h1>
+    <p>S'assurer que votre ordinateur possède tout le nécessaire avant de démarrer</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">💻</div>
+  <div>
+    <strong>Où taper les commandes ?</strong><br>
+    <span class="os-badge os-win">🪟 Windows</span> Appuyez sur la <code>touche Windows</code>, tapez <strong>PowerShell</strong>, appuyez sur Entrée. Toutes les commandes Windows de ce guide sont tapées dans PowerShell.<br><br>
+    <span class="os-badge os-mac">🍎 Mac</span> Appuyez sur <code>Cmd + Espace</code>, tapez <strong>Terminal</strong>, appuyez sur Entrée. Toutes les commandes Mac se tapent dans le Terminal.
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 1.1 — Vérifier que Python est installé</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>python --version</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>python3 --version</code></pre>
+    </div>
+  </div>
+  <div class="expected">
+    <strong>✅ Vous devriez voir quelque chose comme :</strong>
+    <div class="result-box">Python 3.11.x   (toute version 3.9 ou supérieure convient)</div>
+  </div>
+  <div class="callout danger">
+    <div class="icon">🚫</div>
+    <div>
+      <strong>Si Python est introuvable :</strong><br>
+      <span class="os-badge os-win">🪟 Windows</span> Allez sur <strong>python.org → Télécharger Python 3.11</strong> → Installez et <em>cochez la case « Add Python to PATH »</em>.<br><br>
+      <span class="os-badge os-mac">🍎 Mac</span> Exécutez <code>xcode-select --install</code> dans le Terminal, puis allez sur <strong>python.org</strong> pour télécharger l'installateur macOS de Python 3.11.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 1.2 — Vérifier le GPU / la carte graphique</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>nvidia-smi</code></pre>
+      <div class="expected">
+        <strong>✅ Un tableau avec le nom de votre GPU et le pilote :</strong>
+        <div class="result-box">NVIDIA GeForce RTX 3060 Laptop GPU
+Driver Version: 531.79 | CUDA Version: 12.1</div>
+      </div>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>system_profiler SPDisplaysDataType | grep "Chipset Model"</code></pre>
+      <div class="expected">
+        <strong>✅ Exemples de résultats :</strong>
+        <div class="result-box">Chipset Model: Apple M2
+<span style="color:#aaa">(Apple Silicon — puce intégrée performante)</span>
+
+Chipset Model: Intel Iris Plus 640
+<span style="color:#aaa">(Mac Intel — mode CPU uniquement, c'est normal)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 1.3 — Vérifier que Git est installé</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>git --version</code></pre>
+      <p style="font-size:13px">Si introuvable : téléchargez l'installateur sur <strong>git-scm.com</strong></p>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>git --version</code></pre>
+      <p style="font-size:13px">Si une fenêtre s'ouvre pour installer les Outils de ligne de commande Xcode — cliquez sur <strong>Installer</strong>. C'est gratuit.</p>
+    </div>
+  </div>
+  <div class="expected">
+    <strong>✅ Résultat attendu :</strong>
+    <div class="result-box">git version 2.x.x</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 2 — ENVIRONNEMENT VIRTUEL -->
+<div class="section-header" id="venv">
+  <div class="num">2</div>
+  <div>
+    <h1>Créer un environnement Python isolé</h1>
+    <p>Un espace dédié à PySlowFast qui ne peut pas perturber le reste de votre ordinateur</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">🧪</div>
+  <div>
+    <strong>Pourquoi faire ça ?</strong>
+    Imaginez une salle séparée pour une expérience chimique. Tout ce dont PySlowFast a besoin reste dans cette salle.
+    Si quelque chose se passe mal, vous supprimez simplement la salle — tout le reste de votre ordinateur est intact.
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 2.1 — Aller dans votre dossier de cours</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>cd D:\CollegeCDI\machineLearning</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code># Créer le dossier s'il n'existe pas encore
+mkdir -p ~/Documents/machineLearning
+cd ~/Documents/machineLearning</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 2.2 — Créer l'environnement virtuel</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>python -m venv sf_env</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>python3 -m venv sf_env</code></pre>
+    </div>
+  </div>
+  <p>Un dossier appelé <code>sf_env</code> apparaîtra. Cela prend environ 30 secondes.</p>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 2.3 — Activer l'environnement</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>sf_env\Scripts\activate</code></pre>
+      <div class="callout warning" style="margin-top:8px">
+        <div class="icon">⚠️</div>
+        <div style="font-size:12px">
+          <strong>Si vous obtenez une erreur sur les scripts bloqués :</strong><br>
+          Exécutez cette correction une fois, puis réessayez l'ÉTAPE 2.3 :<br>
+          <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>
+        </div>
+      </div>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>source sf_env/bin/activate</code></pre>
+    </div>
+  </div>
+  <div class="expected">
+    <strong>✅ Votre invite de commande affiche maintenant <code>(sf_env)</code> au début :</strong>
+    <div class="result-box">(sf_env) PS D:\CollegeCDI\machineLearning>   ← Windows
+(sf_env) utilisateur@MacBook machineLearning %   ← Mac</div>
+  </div>
+  <div class="callout warning">
+    <div class="icon">⚠️</div>
+    <div>
+      <strong>Chaque fois que vous ouvrez une nouvelle fenêtre de terminal</strong>, vous devez relancer l'ÉTAPE 2.3 avant d'utiliser PySlowFast. L'environnement n'est actif que dans la fenêtre courante.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 2.4 — Mettre à jour pip (le gestionnaire de paquets)</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>python -m pip install --upgrade pip</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>python3 -m pip install --upgrade pip</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 3 — PYTORCH -->
+<div class="page-break"></div>
+<div class="section-header" id="pytorch">
+  <div class="num">3</div>
+  <div>
+    <h1>Installer PyTorch (le moteur IA)</h1>
+    <p>L'installation la plus importante — le moteur qui fait tourner l'IA</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">🧠</div>
+  <div>
+    <strong>Qu'est-ce que PyTorch ?</strong>
+    PyTorch, c'est comme le moteur d'une voiture — PySlowFast est la carrosserie. Sans PyTorch, rien ne fonctionne.
+    On installe une version spécialement adaptée à votre matériel pour que l'IA tourne aussi vite que possible sur votre machine.
+  </div>
+</div>
+
+<!-- Windows -->
+<div class="win-only">
+  <div class="mini-header"><span class="os-badge os-win">🪟 Windows</span> Installation avec CUDA 12.1 (pour RTX 3060)</div>
+  <div class="step">
+    <div class="step-number">ÉTAPE 3.1 — Installer PyTorch + CUDA</div>
+    <pre class="pre-win"><code>pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</code></pre>
+    <div class="callout warning">
+      <div class="icon">⏳</div>
+      <div>Ce téléchargement fait environ <strong>2,5 Go</strong>. Comptez 5 à 15 minutes selon votre connexion. Ne fermez pas la fenêtre.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">ÉTAPE 3.2 — Vérifier que le GPU fonctionne</div>
+    <pre class="pre-win"><code>python -c "import torch; print('PyTorch:', torch.__version__); print('GPU prêt:', torch.cuda.is_available()); print('Nom GPU:', torch.cuda.get_device_name(0))"</code></pre>
+    <div class="expected">
+      <strong>✅ Résultat attendu :</strong>
+      <div class="result-box">PyTorch: 2.x.x+cu121
+GPU prêt: True
+Nom GPU: NVIDIA GeForce RTX 3060 Laptop GPU</div>
+    </div>
+    <div class="callout danger">
+      <div class="icon">🚫</div>
+      <div><strong>Si GPU prêt: False</strong> — votre pilote NVIDIA doit peut-être être mis à jour. Rendez-vous sur nvidia.com/drivers et installez le dernier pilote pour votre GPU.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Mac -->
+<div class="mac-only">
+  <div class="mini-header"><span class="os-badge os-mac">🍎 Mac Apple Silicon</span> PyTorch avec support MPS</div>
+  <div class="step">
+    <div class="step-number">ÉTAPE 3.1-APPLE — Installer PyTorch</div>
+    <p>Le PyTorch moderne inclut MPS (le système GPU d'Apple) automatiquement. Installez simplement la version standard :</p>
+    <pre class="pre-mac"><code>pip install torch torchvision torchaudio</code></pre>
+    <div class="callout warning">
+      <div class="icon">⏳</div>
+      <div>Téléchargement d'environ <strong>700 Mo</strong>. Comptez 2 à 5 minutes.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">ÉTAPE 3.2-APPLE — Vérifier l'installation</div>
+    <pre class="pre-mac"><code>python3 -c "import torch; print('PyTorch:', torch.__version__); print('MPS disponible:', torch.backends.mps.is_available())"</code></pre>
+    <div class="expected">
+      <strong>✅ Résultat attendu sur Mac M1/M2/M3 :</strong>
+      <div class="result-box">PyTorch: 2.x.x
+MPS disponible: True</div>
+    </div>
+    <div class="callout info">
+      <div class="icon">ℹ️</div>
+      <div>
+        <strong>On utilisera quand même le mode CPU pour PySlowFast</strong><br>
+        Même si MPS est disponible, PySlowFast présente des problèmes de compatibilité avec le backend MPS qui peuvent provoquer des plantages.
+        On utilisera <code>NUM_GPUS 0</code> pour forcer le mode CPU — plus lent, mais toujours stable.
+      </div>
+    </div>
+  </div>
+
+  <div class="mini-header" style="margin-top:22px"><span class="os-badge os-mac">🍎 Mac Intel</span> Installation CPU uniquement</div>
+  <div class="step">
+    <div class="step-number">ÉTAPE 3.1-INTEL — Installer PyTorch</div>
+    <pre class="pre-mac"><code>pip install torch torchvision torchaudio</code></pre>
+  </div>
+  <div class="step">
+    <div class="step-number">ÉTAPE 3.2-INTEL — Vérifier l'installation</div>
+    <pre class="pre-mac"><code>python3 -c "import torch; print('PyTorch:', torch.__version__); print('MPS:', torch.backends.mps.is_available())"</code></pre>
+    <div class="expected">
+      <strong>✅ Résultat attendu sur Mac Intel (MPS = False est normal) :</strong>
+      <div class="result-box">PyTorch: 2.x.x
+MPS: False</div>
+    </div>
+    <div class="callout warning">
+      <div class="icon">⚠️</div>
+      <div>
+        <strong>Vitesse sur Mac Intel :</strong> L'entraînement de 5 époques sur le jeu de données fictif prend 15 à 40 minutes.
+        Pour la démo de cours, utilisez le modèle pré-entraîné (Section 9) qui ne prend que quelques minutes même sur un CPU Intel.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 4 — BIBLIOTHÈQUES -->
+<div class="section-header" id="deps">
+  <div class="num">4</div>
+  <div>
+    <h1>Installer toutes les autres bibliothèques</h1>
+    <p>Les outils complémentaires dont PySlowFast a besoin pour fonctionner</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">📦</div>
+  <div>
+    <strong>Ce qu'on installe :</strong><br>
+    <strong>fvcore</strong> — outils Facebook &nbsp;|&nbsp;
+    <strong>opencv</strong> — lecture des vidéos &nbsp;|&nbsp;
+    <strong>tensorboard</strong> — graphiques d'entraînement en direct<br>
+    <strong>av</strong> — décodage MP4/AVI &nbsp;|&nbsp;
+    <strong>iopath</strong> — gestion des fichiers &nbsp;|&nbsp;
+    <strong>scipy / scikit-learn / pandas / timm</strong> — calcul scientifique et vision<br>
+    <strong>pytorchvideo</strong> — installé séparément (étape 4.3) car la version PyPI est trop ancienne
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 4.1 — Installer fvcore</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>pip install fvcore</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>pip install fvcore</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 4.2 — Installer toutes les bibliothèques restantes en une seule commande</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>pip install simplejson psutil opencv-python tensorboard moviepy iopath av matplotlib scipy scikit-learn pandas timm</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>pip install simplejson psutil opencv-python tensorboard moviepy iopath av matplotlib scipy scikit-learn pandas timm</code></pre>
+    </div>
+  </div>
+  <div class="callout warning">
+    <div class="icon">⏳</div>
+    <div>Cela prend 3 à 8 minutes. Beaucoup de texte qui défile est tout à fait normal.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 4.3 — Installer pytorchvideo depuis GitHub <em>(obligatoire — la version PyPI est trop ancienne)</em></div>
+  <div class="callout danger">
+    <div class="icon">🚫</div>
+    <div>
+      <strong>Ne pas utiliser <code>pip install pytorchvideo</code></strong> — la version publiée sur PyPI est obsolète et provoque une erreur <code>ImportError: cannot import name 'cat_all_gather'</code> au démarrage. On installe directement depuis le dépôt GitHub officiel.
+    </div>
+  </div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>pip install "git+https://github.com/facebookresearch/pytorchvideo.git"</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>pip install "git+https://github.com/facebookresearch/pytorchvideo.git"</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 5 — CLONER -->
+<div class="page-break"></div>
+<div class="section-header" id="clone">
+  <div class="num">5</div>
+  <div>
+    <h1>Télécharger PySlowFast</h1>
+    <p>Récupérer le code source depuis GitHub — le dépôt public de Facebook</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 5.1 — Aller dans votre dossier de cours</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>cd D:\CollegeCDI\machineLearning</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>cd ~/Documents/machineLearning</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 5.2 — Cloner PySlowFast depuis GitHub</div>
+  <div class="callout success">
+    <div class="icon">🎓</div>
+    <div>
+      <strong>Option A — Dépôt du professeur (recommandé)</strong><br>
+      Votre professeur a fourni une version pré-corrigée pour Windows : tous les correctifs de compatibilité sont déjà appliqués, le fichier de configuration est pré-configuré. Utilisez l'URL fournie en classe :
+      <pre class="pre-all" style="margin-top:8px"><code>git clone [URL_FOURNIE_PAR_VOTRE_PROFESSEUR] slowfast</code></pre>
+      <span style="font-size:12px; opacity:.8">Si vous n'avez pas reçu d'URL, utilisez l'Option B ci-dessous.</span>
+    </div>
+  </div>
+  <div class="callout info" style="margin-top:10px">
+    <div class="icon">ℹ️</div>
+    <div>
+      <strong>Option B — Dépôt officiel Facebook (non patché)</strong><br>
+      Si vous clonez depuis facebookresearch, le code contient des bugs de compatibilité connus (chemins internes Facebook, API PyTorch obsolètes). Vous devrez appliquer les correctifs manuellement.
+      <pre class="pre-all" style="margin-top:8px"><code>git clone https://github.com/facebookresearch/slowfast</code></pre>
+    </div>
+  </div>
+  <div class="expected">
+    <strong>✅ Résultat attendu :</strong>
+    <div class="result-box">Cloning into 'slowfast'...
+Receiving objects: 100% — done.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 5.3 — Entrer dans le dossier et construire le projet</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>cd slowfast
+python setup.py build develop</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>cd slowfast
+python3 setup.py build develop</code></pre>
+      <p style="font-size:12px; margin-top:6px">Si la construction échoue avec des erreurs de compilation C, exécutez d'abord : <code>xcode-select --install</code></p>
+    </div>
+  </div>
+  <div class="callout warning">
+    <div class="icon">⏳</div>
+    <div>Cela prend 1 à 3 minutes. Vous verrez de nombreuses lignes sur la « construction » — c'est normal.</div>
+  </div>
+  <div class="expected">
+    <strong>✅ Les dernières lignes doivent contenir :</strong>
+    <div class="result-box">Finished processing dependencies for slowfast==...</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 5.4 — Définir PYTHONPATH (indique à Python où trouver le code)</div>
+  <div class="callout info">
+    <div class="icon">💡</div>
+    <div>Exécutez cette commande à chaque fois que vous ouvrez un nouveau terminal. Sur Mac, vous pouvez la rendre permanente en l'ajoutant à <code>~/.zshrc</code>.</div>
+  </div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows PowerShell</span>
+      <pre class="pre-win"><code># À lancer à chaque nouvelle session de terminal :
+$env:PYTHONPATH = "$(Get-Location)\slowfast;$env:PYTHONPATH"</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code># À lancer à chaque nouvelle session de terminal :
+export PYTHONPATH="$(pwd)/slowfast:$PYTHONPATH"
+
+# --- OU rendre permanent (à exécuter une fois) : ---
+echo 'export PYTHONPATH="$HOME/Documents/machineLearning/slowfast:$PYTHONPATH"' >> ~/.zshrc
+source ~/.zshrc</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 6 — JEU DE DONNÉES -->
+<div class="page-break"></div>
+<div class="section-header" id="dataset">
+  <div class="num">6</div>
+  <div>
+    <h1>Créer un faux jeu de données de test</h1>
+    <p>Générer de courtes vidéos aléatoires — sans téléchargement de 140 Go nécessaire</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">🎬</div>
+  <div>
+    <strong>Pourquoi de fausses vidéos ?</strong>
+    Les vrais jeux de données comme Kinetics-400 pèsent 140+ Go et prennent des jours à télécharger.
+    Notre script crée 125 petites vidéos colorées aléatoires — juste assez pour prouver que toute la chaîne de traitement fonctionne, sans attendre.
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 6.1 — Revenir au dossier de cours</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>cd D:\CollegeCDI\machineLearning</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>cd ~/Documents/machineLearning</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 6.2 — Lancer le script de création du jeu de données</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>python slowfast-course\scripts\make_synthetic_dataset.py `
+  --out C:\temp\synthetic_kinetics</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>python3 slowfast-course/scripts/make_synthetic_dataset.py \
+  --out /tmp/synthetic_kinetics</code></pre>
+    </div>
+  </div>
+  <div class="expected">
+    <strong>✅ Résultat attendu (environ 30 secondes) :</strong>
+    <div class="result-box">Wrote .../train.csv  (100 clips)
+Wrote .../val.csv    (25 clips)
+Wrote .../classnames.json
+Dataset ready at: .../synthetic_kinetics</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 6.3 — Créer le fichier test.csv (requis pour la phase d'évaluation)</div>
+  <div class="callout info">
+    <div class="icon">📋</div>
+    <div>PySlowFast cherche un fichier <code>test.csv</code> après l'entraînement. On copie simplement le fichier de validation — le contenu est identique pour ce cours.</div>
+  </div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>Copy-Item C:\temp\synthetic_kinetics\val.csv C:\temp\synthetic_kinetics\test.csv</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>cp /tmp/synthetic_kinetics/val.csv /tmp/synthetic_kinetics/test.csv</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 7 — ENTRAÎNEMENT -->
+<div class="section-header" id="train">
+  <div class="num">7</div>
+  <div>
+    <h1>Entraîner votre premier modèle</h1>
+    <p>Regarder l'IA apprendre de zéro — c'est là que la magie opère</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">🤖</div>
+  <div>
+    <strong>Qu'est-ce que l'entraînement ?</strong>
+    L'IA examine des vidéos étiquetées et ajuste ses paramètres internes jusqu'à ce qu'elle puisse prédire correctement les étiquettes.
+    Chaque passage complet sur toutes les vidéos d'entraînement s'appelle une <strong>époque</strong>.
+    On lance seulement 5 époques pour que ça reste rapide.
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 7.1 — Entrer dans le dossier PySlowFast</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>cd D:\CollegeCDI\machineLearning\slowfast</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>cd ~/Documents/machineLearning/slowfast</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 7.2 — Lancer l'entraînement</div>
+  <div class="callout success">
+    <div class="icon">✅</div>
+    <div>
+      <strong>Tous les paramètres sont déjà dans le fichier YAML</strong> — si vous utilisez le dépôt du professeur, la commande est courte. Pas besoin de la longue liste d'options.
+    </div>
+  </div>
+
+  <div class="win-only">
+    <span class="os-badge os-win">🪟 Windows PowerShell</span>
+    <p style="margin-bottom:8px"><strong>Étape obligatoire — à répéter à chaque nouvelle session de terminal</strong> (évite un plantage lié au réseau Windows) :</p>
+    <pre class="pre-win"><code>$env:TORCH_DISTRIBUTED_USE_LIBUV = "0"</code></pre>
+    <p style="margin:10px 0 8px">Puis lancer l'entraînement :</p>
+    <pre class="pre-win"><code>python tools/run_net.py --cfg configs/Kinetics/C2D_8x8_R50.yaml</code></pre>
+    <div class="callout info" style="margin-top:10px">
+      <div class="icon">ℹ️</div>
+      <div style="font-size:12px">Le fichier <code>configs/Kinetics/C2D_8x8_R50.yaml</code> contient déjà : dataset path, NUM_CLASSES 5, NUM_GPUS 1, BATCH_SIZE 4, MAX_EPOCH 5, OUTPUT_DIR, décodeur pyav, etc.</div>
+    </div>
+  </div>
+
+  <div class="mac-only">
+    <span class="os-badge os-mac">🍎 Mac — Apple Silicon &amp; Intel (mode CPU)</span>
+    <p style="margin-bottom:8px">Sur Mac, quelques paramètres doivent être passés en ligne de commande pour forcer le mode CPU et les bons chemins :</p>
+    <pre class="pre-mac"><code>python3 tools/run_net.py \
+  --cfg configs/Kinetics/C2D_8x8_R50.yaml \
+  NUM_GPUS 0 \
+  DATA.PATH_TO_DATA_DIR /tmp/synthetic_kinetics \
+  OUTPUT_DIR /tmp/sf_output/c2d_test \
+  DATA_LOADER.NUM_WORKERS 0</code></pre>
+    <div class="callout info">
+      <div class="icon">ℹ️</div>
+      <div>
+        <strong>Conseil pour Mac Intel :</strong> Si l'entraînement est trop long, réduisez
+        <code>SOLVER.MAX_EPOCH</code> à 2 et <code>TRAIN.BATCH_SIZE</code> à 1.
+        Cela suffit à prouver que la chaîne de traitement fonctionne correctement.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <div class="icon">⏳</div>
+    <div>
+      <strong>Durées estimées pour 5 époques :</strong><br>
+      🪟 Windows RTX 3060 → environ <strong>3 à 10 minutes</strong><br>
+      🍎 Mac Apple Silicon (M1/M2) → environ <strong>10 à 20 minutes</strong> (mode CPU)<br>
+      🍎 Mac Intel → environ <strong>20 à 45 minutes</strong>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 7.3 — Lire les résultats affichés</div>
+  <p>Pendant l'entraînement, vous verrez des lignes comme celles-ci — c'est l'IA qui apprend :</p>
+  <div class="result-box">Epoch: [1][  1/ 25]  Loss: 1.613  Top1: 20.0%  Top5: 100.0%
+Epoch: [1][  5/ 25]  Loss: 1.591  Top1: 21.0%  Top5: 100.0%
+...
+Epoch: [5][25/ 25]  Loss: 1.402  Top1: 30.0%  Top5: 99.0%   ← La perte baisse = apprentissage !</div>
+
+  <table>
+    <tr><th>Terme affiché</th><th>Ce que ça signifie</th><th>Bon signe ?</th></tr>
+    <tr><td>Epoch [1]</td><td>L'IA a vu toutes les vidéos d'entraînement une fois</td><td>Continue jusqu'à MAX_EPOCH</td></tr>
+    <tr><td>Loss: 1.61</td><td>À quel point l'IA se trompe actuellement</td><td>✅ Doit BAISSER au fil des époques</td></tr>
+    <tr><td>Top1: 20%</td><td>% de vidéos prédites correctement au premier essai</td><td>✅ Doit AUGMENTER au fil des époques</td></tr>
+    <tr><td>Top5: 100%</td><td>La bonne étiquette figure dans les 5 meilleures prédictions</td><td>✅ Généralement très élevé</td></tr>
+  </table>
+
+  <div class="callout success">
+    <div class="icon">🎉</div>
+    <div>
+      <strong>Une faible précision avec de fausses vidéos est normale !</strong>
+      Les vidéos colorées aléatoires n'ont aucun vrai motif à apprendre.
+      L'objectif ici est uniquement de prouver que toute la chaîne d'entraînement fonctionne sans erreur.
+      Avec de vraies vidéos étiquetées, la précision atteint 70 à 80 %.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 7.4 — (Optionnel) Visualiser les graphiques d'entraînement en direct</div>
+  <p>Ouvrez une <strong>deuxième fenêtre de terminal</strong>, activez l'environnement (ÉTAPE 2.3), puis exécutez :</p>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>tensorboard --logdir C:\temp\sf_output</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>tensorboard --logdir /tmp/sf_output</code></pre>
+    </div>
+  </div>
+  <p>Ouvrez ensuite votre navigateur et allez à : <strong>http://localhost:6006</strong></p>
+  <p>Vous verrez des graphiques en direct de la perte et de la précision qui se mettent à jour pendant l'entraînement.</p>
+</div>
+
+<!-- ══════════════════════════════════ ÉTAPE 8 — DÉMO -->
+<div class="page-break"></div>
+<div class="section-header" id="demo">
+  <div class="num">8</div>
+  <div>
+    <h1>Lancer la démo sur une vraie vidéo</h1>
+    <p>Utiliser un modèle déjà entraîné par Facebook — des résultats immédiats, sans entraînement</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="icon">🏆</div>
+  <div>
+    <strong>Modèle pré-entraîné</strong>
+    Au lieu d'entraîner pendant des jours, on télécharge un modèle que Facebook a déjà entraîné sur 240 000 vraies vidéos.
+    On l'utilise immédiatement pour identifier les actions dans n'importe quelle vidéo.
+    C'est ainsi que la plupart des IA fonctionnent dans le monde réel.
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 8.1 — Créer un dossier et télécharger le modèle pré-entraîné</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows PowerShell</span>
+      <pre class="pre-win"><code>mkdir C:\temp\sf_checkpoints
+
+Invoke-WebRequest `
+  -Uri "https://dl.fbaipublicfiles.com/pyslowfast/x3d_models/x3d_m.pyth" `
+  -OutFile "C:\temp\sf_checkpoints\x3d_m.pyth"</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>mkdir -p /tmp/sf_checkpoints
+
+curl -L \
+  "https://dl.fbaipublicfiles.com/pyslowfast/x3d_models/x3d_m.pyth" \
+  -o /tmp/sf_checkpoints/x3d_m.pyth</code></pre>
+    </div>
+  </div>
+  <div class="callout warning">
+    <div class="icon">⏳</div>
+    <div>Le fichier du modèle pèse environ <strong>130 Mo</strong>. Comptez 1 à 3 minutes.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 8.2 — Télécharger le fichier des noms de classes (400 actions)</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>Invoke-WebRequest `
+  -Uri "https://dl.fbaipublicfiles.com/pyslowfast/dataset/class_names/kinetics_classnames.json" `
+  -OutFile "C:\temp\sf_checkpoints\kinetics_classnames.json"</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>curl -L \
+  "https://dl.fbaipublicfiles.com/pyslowfast/dataset/class_names/kinetics_classnames.json" \
+  -o /tmp/sf_checkpoints/kinetics_classnames.json</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 8.3 — Préparer une vidéo test</div>
+  <p>Utilisez <strong>n'importe quelle courte vidéo MP4</strong> (5 à 30 secondes) montrant une action claire : sport, cuisine, danse, exercice, etc. Copiez-la à l'emplacement suivant :</p>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <p>Sauvegardez votre vidéo sous : <code>C:\temp\test_video.mp4</code></p>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <p>Sauvegardez votre vidéo sous : <code>/tmp/test_video.mp4</code></p>
+      <pre class="pre-mac"><code># Copier depuis le dossier Téléchargements (modifiez le nom du fichier) :
+cp ~/Downloads/votre_video.mp4 /tmp/test_video.mp4</code></pre>
+    </div>
+  </div>
+  <p>Pas de vidéo ? N'importe quel fichier MP4 de votre téléphone ou ordinateur fonctionne.</p>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 8.4 — Vérifier que vous êtes dans le dossier PySlowFast</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>cd D:\CollegeCDI\machineLearning\slowfast</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>cd ~/Documents/machineLearning/slowfast</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 8.5 — Lancer la démo !</div>
+
+  <div class="win-only">
+    <span class="os-badge os-win">🪟 Windows PowerShell</span>
+    <pre class="pre-win"><code>python tools/run_net.py `
+  --cfg configs/Kinetics/X3D_M.yaml `
+  TEST.CHECKPOINT_FILE_PATH C:\temp\sf_checkpoints\x3d_m.pyth `
+  TRAIN.ENABLE False `
+  TEST.ENABLE False `
+  DEMO.ENABLE True `
+  DEMO.INPUT_VIDEO C:\temp\test_video.mp4 `
+  DEMO.OUTPUT_FILE C:\temp\demo_resultat.mp4 `
+  DEMO.LABEL_FILE_PATH C:\temp\sf_checkpoints\kinetics_classnames.json `
+  NUM_GPUS 1 `
+  DATA_LOADER.NUM_WORKERS 0</code></pre>
+  </div>
+
+  <div class="mac-only">
+    <span class="os-badge os-mac">🍎 Mac — Apple Silicon &amp; Intel</span>
+    <pre class="pre-mac"><code>python3 tools/run_net.py \
+  --cfg configs/Kinetics/X3D_M.yaml \
+  TEST.CHECKPOINT_FILE_PATH /tmp/sf_checkpoints/x3d_m.pyth \
+  TRAIN.ENABLE False \
+  TEST.ENABLE False \
+  DEMO.ENABLE True \
+  DEMO.INPUT_VIDEO /tmp/test_video.mp4 \
+  DEMO.OUTPUT_FILE /tmp/demo_resultat.mp4 \
+  DEMO.LABEL_FILE_PATH /tmp/sf_checkpoints/kinetics_classnames.json \
+  NUM_GPUS 0 \
+  DATA_LOADER.NUM_WORKERS 0</code></pre>
+  </div>
+
+  <div class="expected">
+    <strong>✅ Résultat attendu :</strong>
+    <div class="result-box">Demo: Inférence en cours sur la vidéo...
+Prediction: playing_guitar   (confiance : 0.73)
+Prediction: playing_guitar   (confiance : 0.81)
+Écriture de la vidéo annotée vers .../demo_resultat.mp4
+Démo terminée.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">ÉTAPE 8.6 — Ouvrir et visionner la vidéo résultante</div>
+  <div class="dual-step">
+    <div class="half win-only">
+      <span class="os-badge os-win">🪟 Windows</span>
+      <pre class="pre-win"><code>Invoke-Item C:\temp\demo_resultat.mp4</code></pre>
+    </div>
+    <div class="half mac-only">
+      <span class="os-badge os-mac">🍎 Mac</span>
+      <pre class="pre-mac"><code>open /tmp/demo_resultat.mp4</code></pre>
+    </div>
+  </div>
+  <div class="callout success">
+    <div class="icon">🎉</div>
+    <div>
+      <strong>Félicitations !</strong>
+      Votre ordinateur vient d'utiliser une IA — entraînée par l'équipe de recherche de Facebook sur 240 000 vraies vidéos — pour identifier l'action dans votre vidéo.
+      Chaque seconde de la vidéo de sortie affiche la prédiction de l'IA et son score de confiance en superposition.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ COMPRENDRE LES RÉSULTATS -->
+<div class="page-break"></div>
+<div class="section-header" id="results">
+  <div class="num">9</div>
+  <div>
+    <h1>Comprendre les résultats</h1>
+    <p>Ce que signifient tous les chiffres affichés</p>
+  </div>
+</div>
+
+<h2>Précision pendant l'entraînement</h2>
+<table>
+  <tr><th>Précision</th><th>Ce que ça signifie</th><th>Quand s'y attendre</th></tr>
+  <tr><td><strong>~20 %</strong></td><td>L'IA devine au hasard (identique au hasard pour 5 classes)</td><td>Données fictives/aléatoires — tout à fait normal !</td></tr>
+  <tr><td><strong>50–60 %</strong></td><td>L'IA a appris quelque chose mais a besoin de plus de données</td><td>Petit jeu de données personnalisé, peu d'époques</td></tr>
+  <tr><td><strong>70–80 %</strong></td><td>Très bon — comparable aux humains sur des cas difficiles</td><td>Kinetics-400 avec le modèle SlowFast</td></tr>
+  <tr><td><strong>80 %+</strong></td><td>État de l'art — meilleurs résultats publiés aujourd'hui</td><td>MViTv2 / grands modèles, données complètes</td></tr>
+</table>
+
+<h2>Scores de confiance dans la démo</h2>
+<table>
+  <tr><th>Plage de score</th><th>Signification</th><th>Faire confiance ?</th></tr>
+  <tr><td>0,90 – 1,00</td><td>Très confiant — l'IA est quasi certaine</td><td>✅ Oui</td></tr>
+  <tr><td>0,60 – 0,90</td><td>Assez confiant</td><td>✅ Probablement</td></tr>
+  <tr><td>0,40 – 0,60</td><td>Hésitant — pourrait être confondu avec une action similaire</td><td>⚠️ Peut-être</td></tr>
+  <tr><td>0,00 – 0,40</td><td>Très incertain — la prédiction est probablement fausse</td><td>❌ Probablement non</td></tr>
+</table>
+
+<!-- ══════════════════════════════════ ERREURS -->
+<div class="section-header" id="errors">
+  <div class="num">10</div>
+  <div>
+    <h1>Erreurs fréquentes et solutions</h1>
+    <p>Ne paniquez pas — chaque erreur de cette liste a une solution</p>
+  </div>
+</div>
+
+<table>
+  <tr><th style="width:32%">Message d'erreur</th><th style="width:15%">Plateforme</th><th>Solution</th></tr>
+  <tr>
+    <td><code>No module named 'slowfast'</code></td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Relancez l'ÉTAPE 5.4 pour redéfinir PYTHONPATH dans votre terminal actuel</td>
+  </tr>
+  <tr>
+    <td><code>CUDA out of memory</code></td>
+    <td><span class="os-badge os-win">🪟</span></td>
+    <td>Ajoutez <code>TRAIN.BATCH_SIZE 2</code> pour réduire la consommation mémoire</td>
+  </tr>
+  <tr>
+    <td><code>Loss is NaN</code></td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Modifiez <code>SOLVER.BASE_LR</code> à <code>0.0001</code> (dix fois plus petit)</td>
+  </tr>
+  <tr>
+    <td><code>No module named 'cv2'</code></td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Exécutez : <code>pip install opencv-python</code></td>
+  </tr>
+  <tr>
+    <td><code>FileNotFoundError: train.csv</code></td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Vérifiez que le chemin dans <code>DATA.PATH_TO_DATA_DIR</code> correspond exactement à l'emplacement de votre jeu de données. Sur Windows : <code>C:\temp\synthetic_kinetics</code></td>
+  </tr>
+  <tr>
+    <td><code>FileNotFoundError: test.csv</code></td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Exécutez l'ÉTAPE 6.3 — copiez <code>val.csv</code> vers <code>test.csv</code> dans le dossier du jeu de données</td>
+  </tr>
+  <tr>
+    <td><code>ImportError: cannot import name 'cat_all_gather'</code></td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Réinstallez pytorchvideo depuis GitHub : <code>pip install "git+https://github.com/facebookresearch/pytorchvideo.git"</code> (Ne pas utiliser <code>pip install pytorchvideo</code>)</td>
+  </tr>
+  <tr>
+    <td>Plantage au démarrage — erreur libuv ou <code>RuntimeError: Address already in use</code></td>
+    <td><span class="os-badge os-win">🪟</span></td>
+    <td>Définissez <code>$env:TORCH_DISTRIBUTED_USE_LIBUV = "0"</code> avant de lancer la commande d'entraînement (à répéter à chaque nouvelle fenêtre de terminal)</td>
+  </tr>
+  <tr>
+    <td><code>Scripts\activate cannot be loaded</code></td>
+    <td><span class="os-badge os-win">🪟</span></td>
+    <td>Exécutez : <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code> puis réessayez</td>
+  </tr>
+  <tr>
+    <td><code>zsh: command not found: python</code></td>
+    <td><span class="os-badge os-mac">🍎</span></td>
+    <td>Utilisez <code>python3</code> à la place de <code>python</code> dans chaque commande</td>
+  </tr>
+  <tr>
+    <td><code>git: command not found</code></td>
+    <td><span class="os-badge os-mac">🍎</span></td>
+    <td>Exécutez <code>xcode-select --install</code> et suivez la fenêtre d'installation</td>
+  </tr>
+  <tr>
+    <td>Plantage MPS ou <code>MPS backend out of memory</code></td>
+    <td><span class="os-badge os-mac">🍎 Puce M</span></td>
+    <td>Ajoutez <code>NUM_GPUS 0</code> pour forcer le mode CPU — le MPS n'est pas entièrement supporté</td>
+  </tr>
+  <tr>
+    <td><code>setup.py build develop</code> échoue avec une erreur du compilateur</td>
+    <td><span class="os-badge os-mac">🍎</span></td>
+    <td>Ouvrez le Terminal et exécutez d'abord <code>xcode-select --install</code> pour installer le compilateur C</td>
+  </tr>
+  <tr>
+    <td>La vidéo de sortie est noire ou ne se lit pas</td>
+    <td><span class="os-badge os-all">Les deux</span></td>
+    <td>Changez l'extension du fichier de sortie de <code>.mp4</code> à <code>.avi</code> dans l'ÉTAPE 8.5</td>
+  </tr>
+  <tr>
+    <td>Entraînement extrêmement lent</td>
+    <td><span class="os-badge os-mac">🍎 Intel</span></td>
+    <td>Définissez <code>SOLVER.MAX_EPOCH 2</code> et <code>TRAIN.BATCH_SIZE 1</code> pour un test plus rapide</td>
+  </tr>
+</table>
+
+<!-- ══════════════════════════════════ GLOSSAIRE -->
+<div class="page-break"></div>
+<div class="section-header" id="glossary">
+  <div class="num">11</div>
+  <div>
+    <h1>Glossaire</h1>
+    <p>Chaque terme technique de ce guide expliqué en langage simple</p>
+  </div>
+</div>
+
+<table>
+  <tr><th>Terme</th><th>Définition en langage simple</th></tr>
+  <tr><td><strong>IA / Intelligence Artificielle</strong></td><td>Un programme qui apprend des motifs à partir d'exemples au lieu de suivre des règles codées manuellement</td></tr>
+  <tr><td><strong>Modèle</strong></td><td>Le « cerveau » de l'IA — un fichier contenant des millions de nombres ajustés pendant l'entraînement</td></tr>
+  <tr><td><strong>Entraînement</strong></td><td>Montrer à l'IA des milliers d'exemples étiquetés pour qu'elle apprenne à reconnaître des motifs</td></tr>
+  <tr><td><strong>Époque</strong></td><td>Un passage complet sur toutes les données d'entraînement. Plus d'époques = plus d'apprentissage (jusqu'à un certain point)</td></tr>
+  <tr><td><strong>Perte (Loss)</strong></td><td>Un chiffre mesurant à quel point l'IA se trompe. Plus c'est bas = mieux c'est. Doit diminuer pendant l'entraînement</td></tr>
+  <tr><td><strong>Précision (Top-1)</strong></td><td>Le pourcentage de vidéos où la première prédiction de l'IA est l'étiquette correcte</td></tr>
+  <tr><td><strong>GPU</strong></td><td>Une puce conçue pour effectuer des milliers de calculs simultanément — rend l'IA 100 fois plus rapide que le CPU</td></tr>
+  <tr><td><strong>CUDA</strong></td><td>Le système NVIDIA pour programmer les GPU depuis Python. Uniquement disponible sur le matériel NVIDIA (Windows)</td></tr>
+  <tr><td><strong>MPS</strong></td><td>Metal Performance Shaders — le système d'accélération GPU d'Apple pour les Mac M1/M2/M3. Pas encore entièrement supporté par PySlowFast</td></tr>
+  <tr><td><strong>Mode CPU uniquement</strong></td><td>Faire tourner l'IA sur le processeur principal plutôt que sur le GPU. Toujours fonctionnel mais plus lent</td></tr>
+  <tr><td><strong>PyTorch</strong></td><td>La bibliothèque d'IA la plus populaire. PySlowFast est construite par-dessus</td></tr>
+  <tr><td><strong>Environnement virtuel</strong></td><td>Un dossier Python isolé. Garde les bibliothèques du projet séparées pour éviter les conflits</td></tr>
+  <tr><td><strong>pip</strong></td><td>Le gestionnaire de paquets Python — l'outil utilisé pour installer des bibliothèques comme PyTorch</td></tr>
+  <tr><td><strong>Point de contrôle (Checkpoint)</strong></td><td>Une copie sauvegardée de l'état du modèle. Permet de reprendre l'entraînement ou de partager l'IA</td></tr>
+  <tr><td><strong>Config / YAML</strong></td><td>Un fichier texte avec tous les paramètres qui contrôlent l'entraînement — comme une recette pour l'IA</td></tr>
+  <tr><td><strong>Modèle pré-entraîné</strong></td><td>Un modèle que quelqu'un d'autre a déjà passé des jours à entraîner — vous le téléchargez et l'utilisez en quelques secondes</td></tr>
+  <tr><td><strong>Kinetics-400</strong></td><td>Un jeu de données de 240 000 vidéos YouTube, chacune étiquetée avec l'un des 400 types d'actions humaines</td></tr>
+  <tr><td><strong>Inférence / Démo</strong></td><td>Utiliser un modèle entraîné pour prédire sur de nouvelles vidéos (pas d'entraînement — juste l'utilisation du cerveau déjà formé)</td></tr>
+  <tr><td><strong>TensorBoard</strong></td><td>Un tableau de bord dans le navigateur à localhost:6006 affichant des graphiques en direct de la progression de l'entraînement</td></tr>
+  <tr><td><strong>Voie Lente / Voie Rapide</strong></td><td>Les deux flux dans SlowFast : la voie Lente capte l'apparence de la scène, la voie Rapide capte les détails de mouvement</td></tr>
+  <tr><td><strong>PYTHONPATH</strong></td><td>Une variable système indiquant à Python où chercher des paquets de code supplémentaires sur votre disque</td></tr>
+</table>
+
+<!-- ══════════════════════════════════ LISTE DE CONTRÔLE -->
+<div class="page-break"></div>
+<h1 id="checklist">✅ Liste de contrôle finale</h1>
+<p>Cochez chaque case au fur et à mesure. Montrez cette page à votre professeur une fois tout terminé.</p>
+
+<div style="margin-top:16px">
+  <div class="mini-header">Partie A — Identifier votre configuration</div>
+  <div class="check-item"><div class="check-box"></div><div>Je sais quel type d'ordinateur j'ai (Windows NVIDIA / Mac Apple Silicon / Mac Intel)</div></div>
+
+  <div class="mini-header" style="margin-top:18px">Partie B — Installation</div>
+  <div class="check-item"><div class="check-box"></div><div>Python 3.9 ou supérieur installé — vérifié avec <code>python --version</code> ou <code>python3 --version</code></div></div>
+  <div class="check-item"><div class="check-box"></div><div>GPU ou carte graphique identifié(e) (<code>nvidia-smi</code> sur Windows / <code>system_profiler</code> sur Mac)</div></div>
+  <div class="check-item"><div class="check-box"></div><div>Git installé et fonctionnel (<code>git --version</code>)</div></div>
+  <div class="check-item"><div class="check-box"></div><div>Environnement virtuel <code>sf_env</code> créé avec succès</div></div>
+  <div class="check-item"><div class="check-box"></div><div>Environnement activé — <code>(sf_env)</code> visible en début d'invite de commande</div></div>
+  <div class="check-item"><div class="check-box"></div><div>PyTorch installé et vérifié (GPU disponible / MPS détecté selon la plateforme)</div></div>
+  <div class="check-item"><div class="check-box"></div><div>Toutes les bibliothèques dépendantes installées (fvcore, opencv, tensorboard, etc.)</div></div>
+  <div class="check-item"><div class="check-box"></div><div>PySlowFast cloné depuis GitHub</div></div>
+  <div class="check-item"><div class="check-box"></div><div>PySlowFast construit avec <code>setup.py build develop</code> — aucune erreur</div></div>
+  <div class="check-item"><div class="check-box"></div><div>PYTHONPATH correctement défini dans le terminal actuel</div></div>
+
+  <div class="mini-header" style="margin-top:18px">Partie C — Faire fonctionner l'IA</div>
+  <div class="check-item"><div class="check-box"></div><div>Jeu de données fictif créé — les fichiers <code>train.csv</code>, <code>val.csv</code> et <code>test.csv</code> existent dans <code>C:\temp\synthetic_kinetics\</code></div></div>
+  <div class="check-item"><div class="check-box"></div><div>Entraînement exécuté pendant 5 époques sans erreur</div></div>
+  <div class="check-item"><div class="check-box"></div><div>La perte (Loss) a bien diminué sur les 5 époques (l'IA a appris)</div></div>
+  <div class="check-item"><div class="check-box"></div><div>Modèle X3D-M pré-entraîné téléchargé (~130 Mo)</div></div>
+  <div class="check-item"><div class="check-box"></div><div>Démo lancée sur une vraie vidéo et fichier de sortie généré</div></div>
+  <div class="check-item"><div class="check-box"></div><div>La vidéo de sortie affiche les étiquettes de prédiction superposées sur la vidéo</div></div>
+</div>
+
+<hr>
+
+<h2 style="margin-top:28px">🚀 Défis — Pour aller plus loin</h2>
+
+<div class="step">
+  <div class="step-number">DÉFI 1 — Facile (toutes les plateformes)</div>
+  <h3>Tester l'IA sur différents types de vidéos</h3>
+  <p>Trouvez 5 vidéos montrant des activités différentes : sport, cuisine, musique, exercice, danse.
+  Exécutez chacune dans la démo. Notez quelles actions l'IA reconnaît correctement et lesquelles elle rate.
+  Pouvez-vous expliquer pourquoi elle se trompe sur certaines vidéos ?</p>
+</div>
+
+<div class="step">
+  <div class="step-number">DÉFI 2 — Intermédiaire (Windows recommandé, Mac possible)</div>
+  <h3>Entraîner sur vos propres vidéos</h3>
+  <p>Filmez-vous en train de faire 3 actions différentes (saluer, applaudir, sauter — 20 vidéos chacune).
+  Créez les fichiers CSV avec le script <code>make_kinetics_csv.py</code> et entraînez un modèle sur votre jeu de données personnel.
+  Quelle précision obtenez-vous après 10 époques ?</p>
+</div>
+
+<div class="step">
+  <div class="step-number">DÉFI 3 — Difficile (Windows recommandé)</div>
+  <h3>Comparer deux architectures de modèles</h3>
+  <p>Entraînez C2D et X3D-M sur le même jeu de données fictif.
+  Utilisez le script <code>benchmark_models.py</code> pour comparer leur vitesse et leur nombre de paramètres.
+  Rédigez un court rapport : quel modèle déploieriez-vous dans une vraie application et pourquoi ?</p>
+</div>
+
+<hr>
+<div style="text-align:center; padding: 26px 0 16px; color: #888; font-size: 12px;">
+  <p><strong>Guide Étudiant PySlowFast — Édition Windows &amp; Mac</strong></p>
+  <p style="margin-top:4px">
+    Basé sur <a href="https://github.com/facebookresearch/SlowFast" style="color:#0f3460">facebookresearch/SlowFast</a>
+    &nbsp;|&nbsp; Licence Apache 2.0 &nbsp;|&nbsp; Facebook AI Research (FAIR)
+  </p>
+</div>
+
+</div><!-- fin .page -->
+
+<!-- BOUTON IMPRIMER (écran uniquement) -->
+<div class="no-print" style="text-align:center; padding: 22px;">
+  <button onclick="window.print()" style="background:#e94560; color:#fff; border:none; padding:13px 34px; font-size:15px; border-radius:8px; cursor:pointer; font-weight:700;">
+    🖨️ Imprimer / Enregistrer en PDF
+  </button>
+  <p style="color:#888; margin-top:8px; font-size:12px;">
+    Menu du navigateur → Imprimer → Destination : « Enregistrer en PDF » → Enregistrer
+  </p>
+</div>
+
+<script>
+function setOS(os) {
+  document.body.className = 'show-' + os;
+  document.querySelectorAll('.ptab').forEach(function(btn) {
+    btn.className = 'ptab';
+  });
+  document.querySelectorAll('.ptab').forEach(function(btn) {
+    if ((os === 'win' && btn.textContent.indexOf('Windows') !== -1) ||
+        (os === 'mac' && btn.textContent.indexOf('Mac') !== -1)) {
+      btn.className = 'ptab ' + (os === 'win' ? 'active-win' : 'active-mac');
+    }
+  });
+}
+</script>
+</body>
+</html>

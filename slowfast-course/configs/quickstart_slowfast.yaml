@@ -1,0 +1,84 @@
+# configs/my_experiment/quickstart_slowfast.yaml
+# ──────────────────────────────────────────────────────────────────────────
+# Single-GPU SlowFast R50 config for custom datasets.
+# Requires ~10 GB GPU VRAM.  Reduce BATCH_SIZE to 2 if OOM.
+# ──────────────────────────────────────────────────────────────────────────
+
+TRAIN:
+  ENABLE: True
+  DATASET: kinetics
+  BATCH_SIZE: 4
+  EVAL_PERIOD: 5
+  CHECKPOINT_PERIOD: 5
+  AUTO_RESUME: True
+
+TEST:
+  ENABLE: True
+  DATASET: kinetics
+  BATCH_SIZE: 4
+  NUM_ENSEMBLE_VIEWS: 1
+  NUM_SPATIAL_CROPS: 1
+
+DATA:
+  PATH_TO_DATA_DIR: /tmp/synthetic_kinetics   # ← Change to your dataset path
+  NUM_FRAMES: 4                 # T — Slow pathway frames
+  SAMPLING_RATE: 16             # τ — temporal stride
+  TRAIN_JITTER_SCALES: [256, 320]
+  TRAIN_CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  INPUT_CHANNEL_NUM: [3, 3]     # [Slow, Fast]
+
+SLOWFAST:
+  ALPHA: 8                      # Fast runs 8× more frames than Slow
+  BETA_INV: 8                   # Fast has 1/8 the channels of Slow
+  FUSION_CONV_CHANNEL_RATIO: 2
+  FUSION_KERNEL_SZ: 7
+
+MODEL:
+  NUM_CLASSES: 5                # ← Change to your number of classes
+  ARCH: slowfast
+  MODEL_NAME: SlowFast
+  LOSS_FUNC: cross_entropy
+  DROPOUT_RATE: 0.5
+
+RESNET:
+  DEPTH: 50
+  TRANS_FUNC: bottleneck_transform
+  STRIDE_1X1: False
+  NUM_GROUPS: 1
+  WIDTH_PER_GROUP: 64
+  ZERO_INIT_FINAL_BN: True
+  NUM_BLOCK_TEMP_KERNEL:
+    - [1, 1]
+    - [1, 1]
+    - [3, 3]
+    - [3, 3]
+
+NONLOCAL:
+  LOCATION: [[[]], [[]], [[]], [[]]]
+  GROUP: [[[1], [1]], [[1], [1]], [[1], [1]], [[1], [1]]]
+  INSTANTIATION: softmax
+
+BN:
+  USE_PRECISE_STATS: False
+
+SOLVER:
+  BASE_LR: 0.000125             # 0.1 × (4 / 3200) — very small batch
+  LR_POLICY: cosine
+  MAX_EPOCH: 20
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 0.0001
+  WARMUP_EPOCHS: 3.0
+  WARMUP_START_LR: 0.0000125
+  OPTIMIZING_METHOD: sgd
+
+DATA_LOADER:
+  NUM_WORKERS: 4
+  PIN_MEMORY: True
+
+NUM_GPUS: 1
+
+TENSORBOARD:
+  ENABLE: True
+
+OUTPUT_DIR: ./output/quickstart_slowfast
